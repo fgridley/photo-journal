@@ -2,36 +2,6 @@ import type { NextPage } from 'next'
 import Image from 'next/image'
 import { Client } from "@notionhq/client";
 
-const Index: NextPage = ({ locations }) => {
-
-  // remove the first 20 locations (for testing purposes)
-  locations = locations.slice(20)
-
-  return (
-    <div>
-      <h1>Photo Journal</h1>
-      {locations.map((location: Location, index: number) => {
-        return (
-          <div key={index}>
-            <h2>{location.name}</h2>
-            {location.photos.map((photo: Photo) => {
-              return (
-                <div>
-                  <Image
-                    src={photo.url}
-                    width={400}
-                    height={400}
-                    />
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
 type Location = {
   id: string;
   name: string;
@@ -44,6 +14,54 @@ type Photo = {
   date: string;
 };
 
+const Index: NextPage = ({ locations }) => {
+
+  // remove the first 20 locations (for testing purposes)
+  locations = locations.slice(20)
+
+  return (
+    <div>
+      <h1 className="text-4xl mb-8">Photo Journal</h1>
+      {/* Timeline section */}
+      <div className="timeline">
+        {locations.map((location: Location, index: number) => {
+          return (
+            <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width">
+              <div className="timeline-left flex flex-grow basis-4 align-start justify-end">
+                <div className="timeline-labels flex align-stretch justify-end">
+                  <div className="timeline-date sticky top-4 m-8">
+                    <p className="text-2xl">{location.name}</p>
+                  </div>
+                  <div className="timeline-circle border-2 border-black rounded-full w-4 h-4"></div>
+                </div>
+                <div className="timeline-line border-l-4 border-black h-full"></div>
+              </div>
+              <div className="timeline-center flex-grow basis-4">
+                {location.photos.map((photo: Photo) => {
+                  return (
+                    <div className="image-wrapper">
+                      <div>
+                        <Image
+                          src={photo.url}
+                          width={400}
+                          height={400}
+                        />
+                      </div>
+                      <div className="image-caption">
+                        <p className="text-xl">{photo.date}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="timeline-right flex-grow basis-4"/>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export const getStaticProps = async () => {
   const notion = new Client({ auth: process.env.NOTION_TOKEN });
