@@ -3,38 +3,54 @@ import Image from 'next/image'
 import { Client } from "@notionhq/client";
 
 type Location = {
-  id: string;
   name: string;
   inTransit: boolean;
+  inTransitFrom: string;
+  inTransitTo: string;
   photos: Photo[];
 };
 
 type Photo = {
-  url: string;
   date: string;
+  url: string;
 };
 
 const Index: NextPage = ({ locations }) => {
-
-  // remove the first 20 locations (for testing purposes)
-  locations = locations.slice(20)
-
   return (
     <div>
-      <h1 className="text-4xl mb-8">Photo Journal</h1>
+      <h1 className="text-4xl m-8">Photo Journal</h1>
       {/* Timeline section */}
-      <div className="timeline">
+      <div className="timeline mt-96">
         {locations.map((location: Location, index: number) => {
           return (
             <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width">
-              <div className="timeline-left flex flex-grow basis-4 align-start justify-end">
-                <div className="timeline-labels flex align-stretch justify-end">
-                  <div className="timeline-date sticky top-4 m-8">
-                    <p className="text-2xl">{location.name}</p>
-                  </div>
-                  <div className="timeline-circle border-2 border-black rounded-full w-4 h-4"></div>
-                </div>
-                <div className="timeline-line border-l-4 border-black h-full"></div>
+              <div className="timeline-left flex flex-grow basis-4 align-start justify-end mr-8">
+                {
+                  // if location is inTransit and next location is inTransit
+                  location.inTransit && locations[index + 1] && locations[index + 1].inTransit ? (
+                    <div className="timeline-labels self-end flex align-stretch justify-end mb-1" style={{ top: "30vh" }}>
+                      <div className="timeline-date mr-16">
+                        <p className="text-2xl">{location.name}</p>
+                      </div>
+                      <div className="timeline-circle border-4 border-white bg-black rounded-full w-6 h-6 my-auto"></div>
+                    </div>) :
+                    // if location not inTransit
+                    !location.inTransit ? (
+                      <div className="timeline-labels sticky self-start flex align-stretch justify-end mb-1" style={{ top: "30vh" }}>
+                        <div className="timeline-date mr-16">
+                          <p className="text-2xl">{location.name}</p>
+                        </div>
+                        <div className="timeline-circle border-4 border-white bg-black rounded-full w-6 h-6 my-auto"></div>
+                      </div>) :
+                      // if location is inTransit and next location is not inTransit
+                      null
+                }
+                {
+                  // if location is inTransit render dotted line
+                  location.inTransit ?
+                    (<div className="timeline-line border-x-4 border-black border-dashed h-full -left-2 relative" style={{ zIndex: "-2", left: "-16px" }}></div>)
+                    : (<div className="timeline-line border-x-4 border-black h-full -left-2 relative" style={{ zIndex: "-2", left: "-16px" }}></div>)
+                }
               </div>
               <div className="timeline-center flex-grow basis-4">
                 {location.photos.map((photo: Photo) => {
@@ -47,14 +63,14 @@ const Index: NextPage = ({ locations }) => {
                           height={400}
                         />
                       </div>
-                      <div className="image-caption">
-                        <p className="text-xl">{photo.date}</p>
+                      <div className="image-caption mb-8">
+                        <p className="text-l">{photo.date}</p>
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <div className="timeline-right flex-grow basis-4"/>
+              <div className="timeline-right flex-grow basis-4" />
             </div>
           );
         })}
@@ -65,67 +81,107 @@ const Index: NextPage = ({ locations }) => {
 
 export const getStaticProps = async () => {
   const notion = new Client({ auth: process.env.NOTION_TOKEN });
-  const data = await notion.databases.query({
-    database_id: process.env.NOTION_LOCATIONS_DATABASE_ID,
-    page_size: 40,
-    sorts: [
-      {
-        property: "Dates",
-        direction: "descending",
-      },
-    ]
-  });
-
-  // Build a list of locations
-  const locations: Location[] = [];
-  data.results.forEach((item) => {
-    const id = item.id;
-    const location = item.properties.Name.title[0].plain_text;
-    const inTransit = item.properties["In Transit"].formula.boolean;
-
-    // Create a new location
-    locations.push({
-      id,
-      name: location,
-      inTransit,
-      photos: [],
-    });
-  });
-
-  await Promise.all(
-    locations.map(async (location) => {
-      // Query for the photos associated with each location and add them to the location
-      const photos = await notion.databases.query({
-        database_id: process.env.NOTION_JOURNAL_DATABASE_ID,
-        filter: {
-          property: "Location Relation",
-          relation: {
-            contains: location.id,
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_DATABASE_ID,
+    page_size: 50,
+    filter: {
+      and: [
+        {
+          property: "Photo",
+          files: {
+            is_not_empty: true,
           },
         },
-        sorts: [
-          {
-            property: "Date",
-            direction: "descending",
+        {
+          property: "Sleeping Location",
+          rich_text: {
+            is_not_empty: true,
           },
-        ],
-      });
+        },
+      ],
+    },
+    sorts: [
+      {
+        property: "Date",
+        direction: "ascending",
+      },
+    ],
+  });
 
-      // Add the photos to the location
-      photos.results.forEach((photo) => {
-        location.photos.push({
-          url: photo.properties["Photo"].files[0].file.url,
-          date: photo.properties["Date"].date.start,
-        });
-      });
-    })
-  );
+  const locations: Location[] = [];
+
+  let lastLocation: Location;
+
+  response.results.forEach((page) => {
+    // title of the journal entry page
+    const date = page.properties.Name.title[0].plain_text;
+    const url = page.properties.Photo.files[0].file.url;
+    const locationName = page.properties["Sleeping Location"].rich_text[0].plain_text;
+
+    const photo: Photo = {
+      date,
+      url,
+    };
+
+    // if the last location is the same as the current location, add the photo to the last location
+    if (lastLocation && lastLocation.name === locationName) {
+      lastLocation.photos.unshift(photo);
+    }
+    // if the inTransitTo property is the same as the current location, create a new location
+    else if (lastLocation && lastLocation.inTransitTo === locationName) {
+      const location: Location = {
+        name: locationName,
+        inTransit: false,
+        inTransitFrom: "",
+        inTransitTo: "",
+        photos: [photo],
+      };
+      locations.push(location);
+      lastLocation = location;
+    }
+    // look for the last date from the photos in the previous location and see if that is one day before the current date
+    // since the photos are sorted from newest to oldest, the first photo in the array is the most recent
+    else if (lastLocation && lastLocation.photos.length > 0 && isOneDayBefore(lastLocation.photos[0].date, date)) {
+      // create a new in transit location
+      const inTransitLocation: Location = {
+        name: lastLocation.inTransit ? lastLocation.inTransitTo + " → " + locationName : lastLocation.name + " → " + locationName,
+        inTransit: true,
+        inTransitFrom: lastLocation.name || lastLocation.inTransitTo,
+        inTransitTo: locationName,
+        photos: [photo],
+      };
+      locations.push(inTransitLocation);
+      lastLocation = inTransitLocation;
+    }
+    // if the last location is not the same as the current location, create a new location
+    else {
+      const location: Location = {
+        name: locationName,
+        inTransitFrom: "",
+        inTransitTo: "",
+        photos: [photo],
+      };
+      locations.push(location);
+      lastLocation = location;
+    }
+  });
+
+  // reverse the array so photos are in chronological order
+  locations.reverse();
 
   return {
     props: {
-      locations
+      locations,
     },
   };
 };
+
+function isOneDayBefore(date1: string, date2: string) {
+  const date1Date = new Date(date1);
+  const date2Date = new Date(date2);
+  const difference = date2Date.getTime() - date1Date.getTime();
+  const differenceInDays = difference / (1000 * 3600 * 24);
+  return differenceInDays === 1;
+}
 
 export default Index;
