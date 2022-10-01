@@ -81,10 +81,16 @@ const Index: NextPage = ({ locations }) => {
 };
 
 export const getStaticProps = async () => {
+  
+  const NUMBER_OF_PHOTOS = 100;
+  const today = new Date();
+  const photosStartDate = new Date(today);
+  photosStartDate.setDate(today.getDate() - NUMBER_OF_PHOTOS);
+  
   const notion = new Client({ auth: process.env.NOTION_TOKEN });
   const response = await notion.databases.query({
     database_id: process.env.NOTION_DATABASE_ID,
-    page_size: 50,
+    page_size: NUMBER_OF_PHOTOS,
     filter: {
       and: [
         {
@@ -99,6 +105,12 @@ export const getStaticProps = async () => {
             is_not_empty: true,
           },
         },
+        {
+          property: "Date",
+          date: {
+            on_or_after: photosStartDate.toISOString(),
+          },
+        }
       ],
     },
     sorts: [
