@@ -27,10 +27,11 @@ const Index: NextPage = ({ locations }) => {
               <div className="timeline-left flex flex-grow basis-4 align-start justify-end mr-8">
                 {
                   // if location is inTransit and next location is inTransit
+                  // show the inTransitFrom location at the bottom
                   location.inTransit && locations[index + 1] && locations[index + 1].inTransit ? (
                     <div className="timeline-labels self-end flex align-stretch justify-end mb-1" style={{ top: "30vh" }}>
                       <div className="timeline-date mr-16">
-                        <p className="text-2xl">{location.name}</p>
+                        <p className="text-2xl">{location.inTransitFrom}</p>
                       </div>
                       <div className="timeline-circle border-4 border-white bg-black rounded-full w-6 h-6 my-auto"></div>
                     </div>) :
@@ -125,7 +126,7 @@ export const getStaticProps = async () => {
 
     // if the last location is the same as the current location, add the photo to the last location
     if (lastLocation && lastLocation.name === locationName) {
-      lastLocation.photos.unshift(photo);
+      lastLocation.photos.unshift(photo);  // add photo to the beginning of the array so they they show up in order
     }
     // if the inTransitTo property is the same as the current location, create a new location
     else if (lastLocation && lastLocation.inTransitTo === locationName) {
@@ -146,7 +147,7 @@ export const getStaticProps = async () => {
       const inTransitLocation: Location = {
         name: lastLocation.inTransit ? lastLocation.inTransitTo + " → " + locationName : lastLocation.name + " → " + locationName,
         inTransit: true,
-        inTransitFrom: lastLocation.name || lastLocation.inTransitTo,
+        inTransitFrom: lastLocation.name.includes("→") ? lastLocation.inTransitTo : lastLocation.name,
         inTransitTo: locationName,
         photos: [photo],
       };
@@ -182,6 +183,6 @@ function isOneDayBefore(date1: string, date2: string) {
   const difference = date2Date.getTime() - date1Date.getTime();
   const differenceInDays = difference / (1000 * 3600 * 24);
   return differenceInDays === 1;
-}
+};
 
 export default Index;
