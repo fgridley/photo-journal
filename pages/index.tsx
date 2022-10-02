@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import Image from 'next/image'
+import Image from 'next/future/image'
 import { Client } from "@notionhq/client";
 
 type Location = {
@@ -74,11 +74,13 @@ const Index: NextPage = ({ locations }: IndexProps) => {
                 {location.photos.map((photo: Photo) => {
                   return (
                     <div className="image-wrapper">
-                      <div>
+                      <div className="w-full relative">
                         <Image
                           src={photo.url}
-                          width={400}
-                          height={400}
+                          width={500}
+                          height={500}
+                          layout="fill"
+                          objectFit="contain"
                         />
                       </div>
                       <div className="image-caption mb-8">
