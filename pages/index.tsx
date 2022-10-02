@@ -18,9 +18,9 @@ type Photo = {
 const Index: NextPage = ({ locations }) => {
   return (
     <div>
-      <h1 className="text-4xl m-8">Photo Journal</h1>
+      <h1 className="text-4xl m-8 mt-40 flex justify-center">Photo Journal</h1>
       {/* Timeline section */}
-      <div className="timeline mt-96">
+      <div className="timeline mt-60">
         {locations.map((location: Location, index: number) => {
           return (
             <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width">
