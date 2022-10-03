@@ -100,8 +100,8 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
 };
 
 export const getStaticProps = async () => {
-  
-  const NUMBER_OF_PHOTOS = 40;
+
+  const NUMBER_OF_PHOTOS = parseInt(process.env.NUMBER_OF_PHOTOS || "50");
   const today = new Date();
   const photosStartDate = new Date(today);
   photosStartDate.setDate(today.getDate() - NUMBER_OF_PHOTOS);
