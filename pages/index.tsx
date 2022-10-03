@@ -51,7 +51,7 @@ type IndexProps = {
   locations: Location[];
 }
 
-const Index: NextPage = ({ locations }: IndexProps) => {
+const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
   return (
     <div>
       <h1 className="text-4xl m-8 mt-40 flex justify-center">Photo Journal</h1>
@@ -59,7 +59,7 @@ const Index: NextPage = ({ locations }: IndexProps) => {
       <div className="timeline mt-60">
         {locations.map((location: Location, index: number) => {
           return (
-            <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width">
+            <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width" key={index}>
               <div className="timeline-left flex flex-grow basis-4 align-start justify-end mr-8">
                 <div className={"timeline-labels flex align-stretch justify-end mb-1 " + timelineLabelClasses(locations, index)} style={{ top: "30vh" }}>
                   <div className="timeline-date mr-16">
@@ -73,14 +73,14 @@ const Index: NextPage = ({ locations }: IndexProps) => {
               <div className="timeline-center flex-grow basis-4">
                 {location.photos.map((photo: Photo) => {
                   return (
-                    <div className="image-wrapper">
+                    <div className="image-wrapper" key={photo.date}>
                       <div className="w-full relative">
                         <Image
                           src={photo.url}
                           width={500}
                           height={500}
-                          layout="fill"
-                          objectFit="contain"
+                          alt={location.name}
+                          style={{ objectFit: "contain" }}
                         />
                       </div>
                       <div className="image-caption mb-8">
@@ -108,7 +108,7 @@ export const getStaticProps = async () => {
   
   const notion = new Client({ auth: process.env.NOTION_TOKEN });
   const response = await notion.databases.query({
-    database_id: process.env.NOTION_DATABASE_ID,
+    database_id: process.env.NOTION_DATABASE_ID as string,
     page_size: NUMBER_OF_PHOTOS,
     filter: {
       and: [
@@ -145,9 +145,11 @@ export const getStaticProps = async () => {
   let lastLocation: Location;
 
   response.results.forEach((page) => {
-    // title of the journal entry page
+    // @ts-ignore
     const date = page.properties.Name.title[0].plain_text;
+    // @ts-ignore
     const url = page.properties.Photo.files[0].file.url;
+    // @ts-ignore
     const locationName = page.properties["Sleeping Location"].rich_text[0].plain_text;
 
     const photo: Photo = {
@@ -189,6 +191,7 @@ export const getStaticProps = async () => {
     else {
       const location: Location = {
         name: locationName,
+        inTransit: false,
         inTransitFrom: "",
         inTransitTo: "",
         photos: [photo],
