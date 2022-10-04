@@ -119,7 +119,7 @@ export const getStaticProps = async () => {
           },
         },
         {
-          property: "Sleeping Location",
+          property: "Location",
           rich_text: {
             is_not_empty: true,
           },
@@ -150,7 +150,7 @@ export const getStaticProps = async () => {
     // @ts-ignore
     const url = page.properties.Photo.files[0].file.url;
     // @ts-ignore
-    const locationName = page.properties["Sleeping Location"].rich_text[0].plain_text;
+    const locationName = page.properties["Location"].rich_text[0].plain_text;
 
     const photo: Photo = {
       date,
