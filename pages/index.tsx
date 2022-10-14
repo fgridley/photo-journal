@@ -99,7 +99,7 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
   );
 };
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
 
   const NUMBER_OF_PHOTOS = parseInt(process.env.NUMBER_OF_PHOTOS || "50");
   const today = new Date();
