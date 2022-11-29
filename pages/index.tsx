@@ -76,7 +76,9 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
                   return (
                     <div className="image-wrapper" key={photo.date}>
                       <div className="w-full relative">
-                        <Image
+                        {/* This should be using Next Image but there are some issues */}
+                        {/* with the number of image optimizations that are being used */}
+                        <img
                           src={photo.url}
                           width={500}
                           height={500}
