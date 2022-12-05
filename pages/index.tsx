@@ -31,6 +31,12 @@ const timelineLabelClasses = (locations: Location[], index: number): String => {
   }
 }
 
+const timelineLabel = (locations: Location[], location: Location, index: number) => (
+  <div className="timeline-date mr-16">
+    <p className="text-2xl">{timelineLabelText(locations, index)}</p>
+  </div>
+);
+
 // Returns timeline location label text based on transit status
 const timelineLabelText = (locations: Location[], index: number): String => {
   // if location is inTransit and next location is inTransit show the inTransitFrom location,
@@ -60,18 +66,22 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
       <div className="timeline mt-60">
         {locations.map((location: Location, index: number) => {
           return (
-            <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width" key={index}>
-              <div className="timeline-left flex flex-grow basis-4 align-start justify-end mr-8">
-                <div className={"timeline-labels flex align-stretch justify-end mb-1 " + timelineLabelClasses(locations, index)} style={{ top: "30vh" }}>
-                  <div className="timeline-date mr-16">
-                    <p className="text-2xl">{timelineLabelText(locations, index)}</p>
+            <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width mx-4 sm:mx-0" key={index}>
+              <div className="timeline-left md:flex-grow basis-1 sm:basis-4 align-start justify-end mr-4 sm:mr-8">
+                <div className={"timeline-labels flex align-stretch justify-end mb-1 top-0 sm:top-[30vh] " + timelineLabelClasses(locations, index)}>
+                  <div className="hidden sm:block">
+                    {timelineLabel(locations, location, index)}
                   </div>
                   <div className="timeline-circle border-4 border-white bg-black rounded-full w-6 h-6 my-auto"></div>
                 </div>
                 {/* if location is inTransit render dotted line */}
-                <div className={`timeline-line border-x-4 border-black h-full -left-2 relative ${location.inTransit ? "border-dashed" : ""}`} style={{ zIndex: "-2", left: "-16px" }}></div>
+                <div className={`timeline-line border-r-4 border-black h-full -left-2 relative ${location.inTransit ? "border-dashed" : ""}`} style={{ zIndex: "-2", left: "-16px" }}></div>
+                
               </div>
               <div className="timeline-center flex-grow basis-4">
+                <div className="flex sticky top-0 z-10 bg-white sm:hidden">
+                  {timelineLabel(locations, location, index)}
+                </div>
                 {location.photos.map((photo: Photo) => {
                   return (
                     <div className="image-wrapper" key={photo.date}>
@@ -93,7 +103,7 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
                   );
                 })}
               </div>
-              <div className="timeline-right flex-grow basis-4" />
+              <div className="timeline-right md:flex-grow basis-1 sm:basis-4" />
             </div>
           );
         })}
