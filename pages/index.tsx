@@ -67,8 +67,8 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
         {locations.map((location: Location, index: number) => {
           return (
             <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width mx-4 sm:mx-0" key={index}>
-              <div className="timeline-left flex flex-grow basis-1 sm:basis-4 align-start justify-end mr-4 sm:mr-8">
-                <div className={"timeline-labels lg:w-40 flex align-stretch justify-end mb-1 top-0 lg:top-[30vh] " + timelineLabelClasses(locations, index)}>
+              <div className="timeline-left flex sm:flex-grow basis-1 sm:basis-4 align-start justify-end mr-4 sm:mr-8">
+                <div className={"timeline-labels lg:w-40 flex align-stretch justify-end mb-1 top-2 lg:top-[30vh] " + timelineLabelClasses(locations, index)}>
                   <div className="hidden lg:block">
                     {timelineLabel(locations, location, index)}
                   </div>
@@ -79,13 +79,13 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
                 
               </div>
               <div className="timeline-center pr-4 flex-grow basis-4">
-                <div className="flex sticky top-0 z-10 bg-white lg:hidden">
+                <div className="flex sticky top-0 py-1 z-10 bg-white lg:hidden">
                   {timelineLabel(locations, location, index)}
                 </div>
                 {location.photos.map((photo: Photo) => {
                   return (
                     <div className="image-wrapper" key={photo.date}>
-                      <div className="w-full min-w-max relative">
+                      <div className="relative w-full sm:min-w-[500px]">
                         {/* This should be using Next Image but there are some issues */}
                         {/* with the number of image optimizations that are being used */}
                         <img
@@ -103,7 +103,7 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
                   );
                 })}
               </div>
-              <div className="timeline-right flex-grow basis-1 sm:basis-4" />
+              <div className="timeline-right sm:flex-grow basis-1 sm:basis-4" />
             </div>
           );
         })}
