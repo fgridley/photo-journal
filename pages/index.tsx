@@ -67,19 +67,19 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
         {locations.map((location: Location, index: number) => {
           return (
             <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width mx-4 sm:mx-0" key={index}>
-              <div className="timeline-left flex md:flex-grow basis-1 sm:basis-4 align-start justify-end mr-4 sm:mr-8">
-                <div className={"timeline-labels min-w-[150px] flex align-stretch justify-end mb-1 top-0 sm:top-[30vh] " + timelineLabelClasses(locations, index)}>
-                  <div className="hidden sm:block">
+              <div className="timeline-left flex flex-grow basis-1 sm:basis-4 align-start justify-end mr-4 sm:mr-8">
+                <div className={"timeline-labels lg:w-40 flex align-stretch justify-end mb-1 top-0 lg:top-[30vh] " + timelineLabelClasses(locations, index)}>
+                  <div className="hidden lg:block">
                     {timelineLabel(locations, location, index)}
                   </div>
-                  <div className="timeline-circle border-4 border-white bg-black rounded-full relative -left-0.5 w-6 h-6 my-auto"></div>
+                  <div className="timeline-circle border-4 border-white bg-black rounded-full relative -left-0.5 w-6 min-w-[24px] h-6 my-auto"></div>
                 </div>
                 {/* if location is inTransit render dotted line */}
                 <div className={`timeline-line border-r-4 border-black h-full -left-2 relative ${location.inTransit ? "border-dashed" : ""}`} style={{ zIndex: "-2", left: "-16px" }}></div>
                 
               </div>
-              <div className="timeline-center flex-grow basis-4">
-                <div className="flex sticky top-0 z-10 bg-white sm:hidden">
+              <div className="timeline-center pr-4 flex-grow basis-4">
+                <div className="flex sticky top-0 z-10 bg-white lg:hidden">
                   {timelineLabel(locations, location, index)}
                 </div>
                 {location.photos.map((photo: Photo) => {
@@ -103,7 +103,7 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
                   );
                 })}
               </div>
-              <div className="timeline-right md:flex-grow basis-1 sm:basis-4" />
+              <div className="timeline-right flex-grow basis-1 sm:basis-4" />
             </div>
           );
         })}
