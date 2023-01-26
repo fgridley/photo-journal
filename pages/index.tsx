@@ -1,5 +1,4 @@
 import type { NextPage } from 'next'
-import Image from 'next/future/image'
 import { Client } from "@notionhq/client";
 
 type Location = {
@@ -60,10 +59,10 @@ type IndexProps = {
 const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
   return (
     <div>
-      <h1 className="text-4xl m-8 mt-40 flex justify-center font-bold">Photo Journal</h1>
-      <h3 className="text-2xl flex justify-center">🚧 This site is under construction 🚧</h3>
+      <h1 className="text-4xl m-8 mt-40 flex justify-center text-center font-bold">Welcome to my Photo Journal</h1>
+      <h3 className="text-gray-500 text-xl mb-6 flex justify-center text-center">Scroll down to see what I've been up to</h3>
       {/* Timeline section */}
-      <div className="timeline mt-60">
+      <div className="timeline mt-40">
         {locations.map((location: Location, index: number) => {
           return (
             <div className="timeline-item flex flex-row flex-nowrap flex-stretch flex-full-width mx-4 sm:mx-0" key={index}>
@@ -107,6 +106,11 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
             </div>
           );
         })}
+      </div>
+      <div className="flex justify-center">
+        <a href="#" className="text-gray-500 hover:text-gray-800 font-bold pt-10 pb-14 px-14 rounded-full">
+          Back to Top
+        </a>
       </div>
     </div>
   );
