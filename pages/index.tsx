@@ -60,7 +60,7 @@ const Index: NextPage<IndexProps> = ({ locations }: IndexProps) => {
   return (
     <div>
       <h1 className="text-4xl m-8 mt-40 flex justify-center text-center font-bold">Welcome to my Photo Journal</h1>
-      <h3 className="text-gray-500 text-xl mb-6 flex justify-center text-center">Scroll down to see what I've been up to</h3>
+      <h3 className="text-gray-500 text-xl mb-6 flex justify-center text-center">Scroll down to see what I&apos;ve been up to</h3>
       {/* Timeline section */}
       <div className="timeline mt-40">
         {locations.map((location: Location, index: number) => {
